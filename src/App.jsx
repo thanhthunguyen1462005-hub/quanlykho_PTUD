@@ -3,9 +3,9 @@ import LoginPage from './LoginPage';
 import DashboardLayout from './DashboardLayout';
 import HomePage from './HomePage';
 import InventoryApprovalPage from './InventoryApprovalPage';
-
+import MaterialRequestPage from './MaterialRequestPage';
 export default function App() {
-  const [user, setUser] = useState(null); 
+  const [user, setUser] = useState(null);
   const [currentTab, setCurrentTab] = useState('home');
 
   if (!user) {
@@ -16,13 +16,16 @@ export default function App() {
   }
 
   return (
-    <DashboardLayout 
-      activeTab={currentTab} 
+    <DashboardLayout
+      activeTab={currentTab}
       onTabChange={setCurrentTab}
       onLogout={() => setUser(null)}
       currentUser={user} // Truyền thông tin user hiện tại sang Layout để phân quyền hiển thị
     >
       {currentTab === 'home' && <HomePage currentUser={user} />}
+      {currentTab === 'request_material' && (
+        <MaterialRequestPage currentUser={user} />
+      )}
       {currentTab === 'approval' && (
         // Kiểm tra bảo mật: Nếu không phải Ban Giám Đốc mà cố tình vào link/tab này sẽ bị chặn
         user.roleKey === 'director' || user.name === 'Ban Giám Đốc' ? (
