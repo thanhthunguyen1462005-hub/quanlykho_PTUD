@@ -9,78 +9,100 @@ import {
     Search,
     Eye,
     Send,
-    Factory
+    Factory,
+    CalendarDays,
+    Boxes
 } from 'lucide-react';
-
 const initialReceipts = [
     {
         maPhieu: 'PNL001',
         maKeHoach: 'KH001',
-        ngayNhan: '2026-11-01',
+
         sanPham: 'Coca-Cola lon 330ml',
+        soLuongSanPham: 10000,
+
+        ngayBatDau: '2026-11-01',
+        ngayKetThuc: '2026-11-05',
+
+        xuongSanXuat: 'Xưởng sản xuất số 1',
+
         trangThai: 'Chờ tiếp nhận',
-        ghiChuKeHoach: 'Nguyên liệu phục vụ sản xuất Coca-Cola.',
+
+        ghiChuKeHoach: 'Kế hoạch sản xuất Coca-Cola đợt 1.',
+
         nguyenLieu: [
             {
                 maHang: 'NL001',
                 tenHang: 'Nước tinh khiết',
                 donVi: 'Lít',
-                soLuong: 1000
+                soLuong: 1100
             },
             {
                 maHang: 'NL002',
                 tenHang: 'Đường',
                 donVi: 'Kg',
-                soLuong: 100
+                soLuong: 110
             },
             {
                 maHang: 'NL003',
                 tenHang: 'CO2',
                 donVi: 'Kg',
-                soLuong: 20
+                soLuong: 22
             },
             {
                 maHang: 'NL004',
                 tenHang: 'Hương liệu Coca-Cola',
                 donVi: 'Lít',
-                soLuong: 5
+                soLuong: 5.5
             }
         ],
+
         ghiChuXuong: ''
     },
+
     {
         maPhieu: 'PNL002',
         maKeHoach: 'KH002',
-        ngayNhan: '2026-11-06',
+
         sanPham: 'Coca-Cola lon 330ml',
+        soLuongSanPham: 15000,
+
+        ngayBatDau: '2026-11-06',
+        ngayKetThuc: '2026-11-10',
+
+        xuongSanXuat: 'Xưởng sản xuất số 2',
+
         trangThai: 'Chờ tiếp nhận',
-        ghiChuKeHoach: 'Chuẩn bị nguyên liệu cho đợt sản xuất tiếp theo.',
+
+        ghiChuKeHoach: 'Kế hoạch sản xuất Coca-Cola đợt 2.',
+
         nguyenLieu: [
             {
                 maHang: 'NL001',
                 tenHang: 'Nước tinh khiết',
                 donVi: 'Lít',
-                soLuong: 1500
+                soLuong: 1650
             },
             {
                 maHang: 'NL002',
                 tenHang: 'Đường',
                 donVi: 'Kg',
-                soLuong: 150
+                soLuong: 165
             },
             {
                 maHang: 'NL003',
                 tenHang: 'CO2',
                 donVi: 'Kg',
-                soLuong: 30
+                soLuong: 33
             },
             {
                 maHang: 'NL004',
                 tenHang: 'Hương liệu Coca-Cola',
                 donVi: 'Lít',
-                soLuong: 7
+                soLuong: 7.7
             }
         ],
+
         ghiChuXuong: ''
     }
 ];
@@ -92,11 +114,14 @@ export default function MaterialRequestPage({ currentUser }) {
     const [result, setResult] = useState('Đã nhận đủ');
     const [note, setNote] = useState('');
 
+    // TÌM KIẾM PHIẾU
     const filteredReceipts = receipts.filter((receipt) =>
         receipt.maPhieu.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        receipt.maKeHoach.toLowerCase().includes(searchTerm.toLowerCase())
+        receipt.maKeHoach.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        receipt.sanPham.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    // THỐNG KÊ
     const waitingCount = receipts.filter(
         (item) => item.trangThai === 'Chờ tiếp nhận'
     ).length;
@@ -109,18 +134,27 @@ export default function MaterialRequestPage({ currentUser }) {
         (item) => item.trangThai === 'Cần xử lý'
     ).length;
 
+    // ĐỊNH DẠNG NGÀY
+    const formatDate = (date) => {
+        if (!date) return '';
+        return new Date(date + 'T00:00:00').toLocaleDateString('vi-VN');
+    };
+
+    // MỞ CHI TIẾT KẾ HOẠCH
     const openReceipt = (receipt) => {
         setSelectedReceipt(receipt);
         setResult('Đã nhận đủ');
         setNote(receipt.ghiChuXuong || '');
     };
 
+    // ĐÓNG CHI TIẾT
     const closeReceipt = () => {
         setSelectedReceipt(null);
         setResult('Đã nhận đủ');
         setNote('');
     };
 
+    // XƯỞNG GỬI PHẢN HỒI
     const handleSubmit = () => {
         if (!selectedReceipt) return;
 
@@ -151,6 +185,7 @@ export default function MaterialRequestPage({ currentUser }) {
         closeReceipt();
     };
 
+    // MÀU TRẠNG THÁI
     const getStatusClass = (status) => {
         if (status === 'Đã nhận đủ') {
             return 'bg-green-100 text-green-700';
@@ -170,13 +205,15 @@ export default function MaterialRequestPage({ currentUser }) {
             <div>
                 <div className="flex items-center gap-3">
                     <Factory size={30} className="text-blue-600" />
+
                     <h1 className="text-2xl font-bold text-gray-800">
-                        Lập phiếu nhận nguyên liệu
+                        Tiếp nhận kế hoạch và nguyên liệu sản xuất
                     </h1>
                 </div>
 
                 <p className="text-gray-500 mt-2">
-                    Tiếp nhận và kiểm tra nguyên liệu phục vụ sản xuất Coca-Cola.
+                    Xem kế hoạch sản xuất do Bộ phận Kế hoạch gửi đến,
+                    kiểm tra và xác nhận nguyên liệu.
                 </p>
             </div>
 
@@ -187,7 +224,7 @@ export default function MaterialRequestPage({ currentUser }) {
                     <div className="flex items-center gap-3">
                         <ClipboardList className="text-blue-600" size={28} />
                         <div>
-                            <p className="text-sm text-gray-500">Tổng phiếu</p>
+                            <p className="text-sm text-gray-500">Tổng kế hoạch</p>
                             <p className="text-2xl font-bold">{receipts.length}</p>
                         </div>
                     </div>
@@ -225,16 +262,17 @@ export default function MaterialRequestPage({ currentUser }) {
 
             </div>
 
-            {/* DANH SÁCH PHIẾU */}
+            {/* DANH SÁCH KẾ HOẠCH */}
             <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
 
                 <div className="p-5 border-b flex flex-col md:flex-row md:justify-between md:items-center gap-3">
                     <div>
                         <h2 className="text-lg font-bold">
-                            Danh sách phiếu nhận nguyên liệu
+                            Danh sách kế hoạch sản xuất
                         </h2>
+
                         <p className="text-sm text-gray-500 mt-1">
-                            Phiếu do Bộ phận Kế hoạch sản xuất chuyển đến.
+                            Các kế hoạch được Bộ phận Kế hoạch chuyển đến Xưởng.
                         </p>
                     </div>
 
@@ -243,11 +281,12 @@ export default function MaterialRequestPage({ currentUser }) {
                             size={18}
                             className="absolute left-3 top-3 text-gray-400"
                         />
+
                         <input
                             type="text"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Tìm mã phiếu hoặc mã kế hoạch..."
+                            placeholder="Tìm mã kế hoạch, sản phẩm..."
                             className="border rounded-lg pl-10 pr-4 py-2 w-full md:w-80 outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
@@ -255,12 +294,14 @@ export default function MaterialRequestPage({ currentUser }) {
 
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
+
                         <thead className="bg-gray-50 text-gray-600">
                             <tr>
-                                <th className="p-4">Mã phiếu</th>
                                 <th className="p-4">Mã kế hoạch</th>
                                 <th className="p-4">Sản phẩm</th>
-                                <th className="p-4">Ngày nhận</th>
+                                <th className="p-4 text-right">Số lượng sản phẩm</th>
+                                <th className="p-4">Xưởng sản xuất</th>
+                                <th className="p-4">Thời gian sản xuất</th>
                                 <th className="p-4">Trạng thái</th>
                                 <th className="p-4 text-center">Thao tác</th>
                             </tr>
@@ -268,14 +309,31 @@ export default function MaterialRequestPage({ currentUser }) {
 
                         <tbody className="divide-y">
                             {filteredReceipts.map((receipt) => (
-                                <tr key={receipt.maPhieu} className="hover:bg-gray-50">
+                                <tr
+                                    key={receipt.maPhieu}
+                                    className="hover:bg-gray-50"
+                                >
                                     <td className="p-4 font-semibold text-blue-700">
-                                        {receipt.maPhieu}
+                                        {receipt.maKeHoach}
                                     </td>
 
-                                    <td className="p-4">{receipt.maKeHoach}</td>
-                                    <td className="p-4">{receipt.sanPham}</td>
-                                    <td className="p-4">{receipt.ngayNhan}</td>
+                                    <td className="p-4">
+                                        {receipt.sanPham}
+                                    </td>
+
+                                    <td className="p-4 text-right font-medium">
+                                        {receipt.soLuongSanPham.toLocaleString('vi-VN')}
+                                    </td>
+
+                                    <td className="p-4">
+                                        {receipt.xuongSanXuat}
+                                    </td>
+
+                                    <td className="p-4 whitespace-nowrap">
+                                        {formatDate(receipt.ngayBatDau)}
+                                        {' - '}
+                                        {formatDate(receipt.ngayKetThuc)}
+                                    </td>
 
                                     <td className="p-4">
                                         <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusClass(receipt.trangThai)}`}>
@@ -299,27 +357,32 @@ export default function MaterialRequestPage({ currentUser }) {
 
                             {filteredReceipts.length === 0 && (
                                 <tr>
-                                    <td colSpan="6" className="p-8 text-center text-gray-500">
-                                        Không tìm thấy phiếu nhận nguyên liệu.
+                                    <td
+                                        colSpan="7"
+                                        className="p-8 text-center text-gray-500"
+                                    >
+                                        Không tìm thấy kế hoạch sản xuất.
                                     </td>
                                 </tr>
                             )}
                         </tbody>
+
                     </table>
                 </div>
             </div>
 
-            {/* CHI TIẾT PHIẾU */}
+            {/* CHI TIẾT KẾ HOẠCH */}
             {selectedReceipt && (
                 <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
 
                     <div className="p-5 border-b bg-blue-50 flex justify-between items-center">
                         <div>
                             <h2 className="text-lg font-bold text-gray-800">
-                                Chi tiết phiếu {selectedReceipt.maPhieu}
+                                Chi tiết kế hoạch {selectedReceipt.maKeHoach}
                             </h2>
+
                             <p className="text-sm text-gray-500 mt-1">
-                                Sản phẩm sản xuất: {selectedReceipt.sanPham}
+                                Phiếu tiếp nhận: {selectedReceipt.maPhieu}
                             </p>
                         </div>
 
@@ -333,17 +396,17 @@ export default function MaterialRequestPage({ currentUser }) {
 
                     <div className="p-5 space-y-6">
 
-                        {/* THÔNG TIN PHIẾU */}
+                        {/* THÔNG TIN KẾ HOẠCH */}
                         <section>
-                            <h3 className="font-bold mb-3">
-                                1. Thông tin phiếu nhận nguyên liệu
-                            </h3>
+                            <div className="flex items-center gap-2 mb-3">
+                                <ClipboardList className="text-blue-600" size={21} />
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div className="bg-gray-50 rounded-lg p-3">
-                                    <p className="text-sm text-gray-500">Mã phiếu</p>
-                                    <p className="font-semibold">{selectedReceipt.maPhieu}</p>
-                                </div>
+                                <h3 className="font-bold">
+                                    1. Thông tin kế hoạch sản xuất
+                                </h3>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
                                 <div className="bg-gray-50 rounded-lg p-3">
                                     <p className="text-sm text-gray-500">Mã kế hoạch</p>
@@ -351,9 +414,38 @@ export default function MaterialRequestPage({ currentUser }) {
                                 </div>
 
                                 <div className="bg-gray-50 rounded-lg p-3">
-                                    <p className="text-sm text-gray-500">Ngày nhận</p>
-                                    <p className="font-semibold">{selectedReceipt.ngayNhan}</p>
+                                    <p className="text-sm text-gray-500">Sản phẩm</p>
+                                    <p className="font-semibold">{selectedReceipt.sanPham}</p>
                                 </div>
+
+                                <div className="bg-gray-50 rounded-lg p-3">
+                                    <p className="text-sm text-gray-500">Số lượng sản phẩm</p>
+                                    <p className="font-semibold">
+                                        {selectedReceipt.soLuongSanPham.toLocaleString('vi-VN')} sản phẩm
+                                    </p>
+                                </div>
+
+                                <div className="bg-gray-50 rounded-lg p-3">
+                                    <p className="text-sm text-gray-500">Ngày bắt đầu</p>
+                                    <p className="font-semibold">
+                                        {formatDate(selectedReceipt.ngayBatDau)}
+                                    </p>
+                                </div>
+
+                                <div className="bg-gray-50 rounded-lg p-3">
+                                    <p className="text-sm text-gray-500">Ngày kết thúc</p>
+                                    <p className="font-semibold">
+                                        {formatDate(selectedReceipt.ngayKetThuc)}
+                                    </p>
+                                </div>
+
+                                <div className="bg-gray-50 rounded-lg p-3">
+                                    <p className="text-sm text-gray-500">Xưởng sản xuất</p>
+                                    <p className="font-semibold">
+                                        {selectedReceipt.xuongSanXuat}
+                                    </p>
+                                </div>
+
                             </div>
 
                             <div className="bg-gray-50 rounded-lg p-3 mt-3">
@@ -366,18 +458,20 @@ export default function MaterialRequestPage({ currentUser }) {
                         <section>
                             <div className="flex items-center gap-2 mb-3">
                                 <Package className="text-blue-600" size={21} />
+
                                 <h3 className="font-bold">
-                                    2. Danh sách nguyên liệu cần nhận
+                                    2. Danh sách nguyên liệu cần nhập
                                 </h3>
                             </div>
 
                             <div className="overflow-x-auto border rounded-lg">
                                 <table className="w-full text-sm">
+
                                     <thead className="bg-gray-50">
                                         <tr>
                                             <th className="p-3 text-left">Mã nguyên liệu</th>
                                             <th className="p-3 text-left">Tên nguyên liệu</th>
-                                            <th className="p-3 text-right">Số lượng kế hoạch</th>
+                                            <th className="p-3 text-right">Số lượng cần nhập</th>
                                             <th className="p-3 text-left">Đơn vị</th>
                                         </tr>
                                     </thead>
@@ -386,23 +480,39 @@ export default function MaterialRequestPage({ currentUser }) {
                                         {selectedReceipt.nguyenLieu.map((item) => (
                                             <tr key={item.maHang}>
                                                 <td className="p-3">{item.maHang}</td>
-                                                <td className="p-3 font-medium">{item.tenHang}</td>
-                                                <td className="p-3 text-right">
+
+                                                <td className="p-3 font-medium">
+                                                    {item.tenHang}
+                                                </td>
+
+                                                <td className="p-3 text-right font-semibold">
                                                     {item.soLuong.toLocaleString('vi-VN')}
                                                 </td>
+
                                                 <td className="p-3">{item.donVi}</td>
                                             </tr>
                                         ))}
                                     </tbody>
+
                                 </table>
                             </div>
                         </section>
 
                         {/* PHẢN HỒI CỦA XƯỞNG */}
                         <section className="border-t pt-5">
-                            <h3 className="font-bold mb-3">
-                                3. Kết quả kiểm tra nguyên liệu
-                            </h3>
+
+                            <div className="flex items-center gap-2 mb-3">
+                                <Boxes className="text-blue-600" size={21} />
+
+                                <h3 className="font-bold">
+                                    3. Xác nhận tiếp nhận nguyên liệu
+                                </h3>
+                            </div>
+
+                            <p className="text-sm text-gray-500 mb-4">
+                                Xưởng kiểm tra nguyên liệu theo kế hoạch và gửi kết quả
+                                cho Bộ phận Kế hoạch.
+                            </p>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
@@ -411,12 +521,14 @@ export default function MaterialRequestPage({ currentUser }) {
                                     disabled={selectedReceipt.trangThai !== 'Chờ tiếp nhận'}
                                     onClick={() => setResult('Đã nhận đủ')}
                                     className={`p-4 rounded-lg border-2 flex items-center gap-3 ${result === 'Đã nhận đủ'
-                                            ? 'border-green-500 bg-green-50 text-green-700'
-                                            : 'border-gray-200 hover:bg-gray-50'
+                                        ? 'border-green-500 bg-green-50 text-green-700'
+                                        : 'border-gray-200 hover:bg-gray-50'
                                         } disabled:opacity-60`}
                                 >
                                     <CheckCircle size={22} />
-                                    <span className="font-semibold">Đã nhận đủ nguyên liệu</span>
+                                    <span className="font-semibold">
+                                        Đã nhận đủ nguyên liệu
+                                    </span>
                                 </button>
 
                                 <button
@@ -424,12 +536,14 @@ export default function MaterialRequestPage({ currentUser }) {
                                     disabled={selectedReceipt.trangThai !== 'Chờ tiếp nhận'}
                                     onClick={() => setResult('Cần xử lý')}
                                     className={`p-4 rounded-lg border-2 flex items-center gap-3 ${result === 'Cần xử lý'
-                                            ? 'border-red-500 bg-red-50 text-red-700'
-                                            : 'border-gray-200 hover:bg-gray-50'
+                                        ? 'border-red-500 bg-red-50 text-red-700'
+                                        : 'border-gray-200 hover:bg-gray-50'
                                         } disabled:opacity-60`}
                                 >
                                     <AlertCircle size={22} />
-                                    <span className="font-semibold">Cần xử lý</span>
+                                    <span className="font-semibold">
+                                        Cần xử lý
+                                    </span>
                                 </button>
 
                             </div>
@@ -437,6 +551,7 @@ export default function MaterialRequestPage({ currentUser }) {
                             <div className="mt-4">
                                 <label className="block font-semibold text-gray-700 mb-2">
                                     Ghi chú của Xưởng
+
                                     {result === 'Cần xử lý' && (
                                         <span className="text-red-500"> *</span>
                                     )}
@@ -454,6 +569,7 @@ export default function MaterialRequestPage({ currentUser }) {
 
                             {selectedReceipt.trangThai === 'Chờ tiếp nhận' ? (
                                 <div className="flex justify-end gap-3 mt-5">
+
                                     <button
                                         onClick={closeReceipt}
                                         className="px-5 py-2 border rounded-lg hover:bg-gray-50"
@@ -468,23 +584,27 @@ export default function MaterialRequestPage({ currentUser }) {
                                         <Send size={17} />
                                         Gửi xác nhận
                                     </button>
+
                                 </div>
                             ) : (
                                 <div className="mt-5 p-3 bg-gray-50 rounded-lg">
                                     <p className="font-semibold">
                                         Trạng thái: {selectedReceipt.trangThai}
                                     </p>
+
                                     <p className="text-sm text-gray-600 mt-1">
                                         {selectedReceipt.ghiChuXuong || 'Không có ghi chú.'}
                                     </p>
                                 </div>
                             )}
+
                         </section>
 
                     </div>
                 </div>
             )}
 
+            {/* NGƯỜI TIẾP NHẬN */}
             <p className="text-xs text-gray-400">
                 Người tiếp nhận: {currentUser?.name || 'Nhân viên Xưởng'}
             </p>
